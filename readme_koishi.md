@@ -9,3 +9,5 @@ $ make ergodox-ez-osx_jis_koishi
 $ make teensy keymap=osx_jis_koishi
 
 # Keymap
+
+https://github.com/koishi/qmk_firmware/blob/master/keyboards/ergodox/keymaps/osx_jis_koishi/keymap.c
