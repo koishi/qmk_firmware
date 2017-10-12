@@ -1,4 +1,4 @@
-# Koishi ErgoDox EZ Keymap
+# osx_jis_koishi ErgoDox EZ Keymap
 
 # Build Setup
 
