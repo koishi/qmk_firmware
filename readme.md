@@ -14,12 +14,12 @@ $ brew install avr-libc
 
 # Build Command
 
-$ cd /Users/koishi/dev_private/qmk_firmware/keyboards/ergodox
+$ cd /Users/koishi/dev_private/qmk_firmware/
 
-$ make ergodox-ez-osx_jis_koishi
+$ make ergodox_ez:osx_jis_koishi
 
-$ make teensy keymap=osx_jis_koishi
+$ make teensy ergodox_ez:osx_jis_koishi
 
 # Keymap
 
-https://github.com/koishi/qmk_firmware/blob/master/keyboards/ergodox/keymaps/osx_jis_koishi/keymap.c
+https://github.com/koishi/qmk_firmware/blob/master/keyboards/ergodox_ez/keymaps/osx_jis_koishi/keymap.c
