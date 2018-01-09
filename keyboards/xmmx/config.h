@@ -5,27 +5,29 @@
 
 /* USB Device descriptor parameter */
 #define VENDOR_ID       0xFEED
-#define PRODUCT_ID      0xCA60
+#define PRODUCT_ID      0x6776
 #define DEVICE_VER      0x0001
-#define MANUFACTURER    MECHKEYS
-#define PRODUCT         ACR60
-#define DESCRIPTION     60% customizable keyboard
+#define MANUFACTURER    farmakon
+#define PRODUCT         "XMMX"
+#define DESCRIPTION     "XMMX"
 
 /* key matrix size */
-#define MATRIX_ROWS 5
-#define MATRIX_COLS 15
+#define MATRIX_ROWS 6
+#define MATRIX_COLS 17
 
 /* key matrix pins */
-#define MATRIX_ROW_PINS { D0, D1, D2, D3, D5 }
-#define MATRIX_COL_PINS { F0, F1, E6, C7, C6, B7, D4, B1, B0, B5, B4, D7, D6, B3, F4 }
+#define MATRIX_ROW_PINS { B0, F6, F5, F4, F1, F0 }
+#define MATRIX_COL_PINS { B3, B2, B1, E6, B7, C7, C6, D4, D6, D7, B4, D0, D1, F7, D2, D3, D5 }
 #define UNUSED_PINS
 
 /* COL2ROW or ROW2COL */
 #define DIODE_DIRECTION COL2ROW
 
 /* number of backlight levels */
-#define BACKLIGHT_PIN B6
-#define BACKLIGHT_LEVELS 5
+
+#ifdef BACKLIGHT_PIN
+#define BACKLIGHT_LEVELS 0
+#endif
 
 /* Set 0 if debouncing isn't needed */
 #define DEBOUNCING_DELAY 5
@@ -44,11 +46,13 @@
 /* prevent stuck modifiers */
 #define PREVENT_STUCK_MODIFIERS
 
-#define RGB_DI_PIN E2
+
+#ifdef RGB_DI_PIN
 #define RGBLIGHT_ANIMATIONS
-#define RGBLED_NUM 20
+#define RGBLED_NUM 0
 #define RGBLIGHT_HUE_STEP 8
 #define RGBLIGHT_SAT_STEP 8
 #define RGBLIGHT_VAL_STEP 8
+#endif
 
 #endif
