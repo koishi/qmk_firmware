@@ -18,7 +18,9 @@ $ cd /Users/koishi/dev_private/qmk_firmware/
 
 $ make ergodox_ez:osx_jis_koishi
 
-$ make teensy ergodox_ez:osx_jis_koishi
+$ teensy_loader_cli -mmcu=atmega32u4 -w -v ergodox_ez_osx_jis_koishi.hex
+
+> If using Karabiner-Elements, will quit
 
 # Keymap
 
