@@ -18,7 +18,7 @@
 
 #include "rgb_matrix.h"
 #include <avr/io.h>
-#include "TWIlib.h"
+#include "i2c_master.h"
 #include <util/delay.h>
 #include <avr/interrupt.h>
 #include "progmem.h"
@@ -149,8 +149,9 @@ void rgb_matrix_set_suspend_state(bool state) {
 
 void rgb_matrix_test(void) {
     // Mask out bits 4 and 5
-    // This 2-bit value will stay the same for 16 ticks.
-    switch ( (g_tick & 0x30) >> 4 )
+    // Increase the factor to make the test animation slower (and reduce to make it faster)
+    uint8_t factor = 10;
+    switch ( (g_tick & (0b11 << factor)) >> factor )
     {
         case 0:
         {
@@ -324,8 +325,8 @@ void rgb_matrix_raindrops(bool initialize) {
     HSV hsv;
     RGB rgb;
 
-    // Change one LED every tick
-    uint8_t led_to_change = ( g_tick & 0x000 ) == 0 ? rand() % DRIVER_LED_TOTAL : 255;
+    // Change one LED every tick, make sure speed is not 0
+    uint8_t led_to_change = ( g_tick & ( 0x0A / (rgb_matrix_config.speed == 0 ? 1 : rgb_matrix_config.speed) ) ) == 0 ? rand() % (DRIVER_LED_TOTAL) : 255;
 
     for ( int i=0; i<DRIVER_LED_TOTAL; i++ )
     {
@@ -432,7 +433,7 @@ void rgb_matrix_rainbow_beacon(void) {
     rgb_led led;
     for (uint8_t i = 0; i < DRIVER_LED_TOTAL; i++) {
         led = g_rgb_leds[i];
-        hsv.h = 1.5 * (led.point.y - 32.0)* cos(g_tick * PI / 128) + 1.5 * (led.point.x - 112.0) * sin(g_tick * PI / 128) + rgb_matrix_config.hue;
+        hsv.h = (1.5 * (rgb_matrix_config.speed == 0 ? 1 : rgb_matrix_config.speed)) * (led.point.y - 32.0)* cos(g_tick * PI / 128) + (1.5 * (rgb_matrix_config.speed == 0 ? 1 : rgb_matrix_config.speed)) * (led.point.x - 112.0) * sin(g_tick * PI / 128) + rgb_matrix_config.hue;
         rgb = hsv_to_rgb( hsv );
         rgb_matrix_set_color( i, rgb.r, rgb.g, rgb.b );
     }
@@ -444,7 +445,7 @@ void rgb_matrix_rainbow_pinwheels(void) {
     rgb_led led;
     for (uint8_t i = 0; i < DRIVER_LED_TOTAL; i++) {
         led = g_rgb_leds[i];
-        hsv.h = 2 * (led.point.y - 32.0)* cos(g_tick * PI / 128) + 2 * (66 - abs(led.point.x - 112.0)) * sin(g_tick * PI / 128) + rgb_matrix_config.hue;
+        hsv.h = (2 * (rgb_matrix_config.speed == 0 ? 1 : rgb_matrix_config.speed)) * (led.point.y - 32.0)* cos(g_tick * PI / 128) + (2 * (rgb_matrix_config.speed == 0 ? 1 : rgb_matrix_config.speed)) * (66 - abs(led.point.x - 112.0)) * sin(g_tick * PI / 128) + rgb_matrix_config.hue;
         rgb = hsv_to_rgb( hsv );
         rgb_matrix_set_color( i, rgb.r, rgb.g, rgb.b );
     }
@@ -458,7 +459,7 @@ void rgb_matrix_rainbow_moving_chevron(void) {
         led = g_rgb_leds[i];
         // uint8_t r = g_tick;
         uint8_t r = 32;
-        hsv.h = 1.5 * abs(led.point.y - 32.0)* sin(r * PI / 128) + 1.5 * (led.point.x - (g_tick / 256.0 * 224)) * cos(r * PI / 128) + rgb_matrix_config.hue;
+        hsv.h = (1.5 * (rgb_matrix_config.speed == 0 ? 1 : rgb_matrix_config.speed)) * abs(led.point.y - 32.0)* sin(r * PI / 128) + (1.5 * (rgb_matrix_config.speed == 0 ? 1 : rgb_matrix_config.speed)) * (led.point.x - (g_tick / 256.0 * 224)) * cos(r * PI / 128) + rgb_matrix_config.hue;
         rgb = hsv_to_rgb( hsv );
         rgb_matrix_set_color( i, rgb.r, rgb.g, rgb.b );
     }
@@ -469,8 +470,8 @@ void rgb_matrix_jellybean_raindrops( bool initialize ) {
     HSV hsv;
     RGB rgb;
 
-    // Change one LED every tick
-    uint8_t led_to_change = ( g_tick & 0x000 ) == 0 ? rand() % DRIVER_LED_TOTAL : 255;
+    // Change one LED every tick, make sure speed is not 0
+    uint8_t led_to_change = ( g_tick & ( 0x0A / (rgb_matrix_config.speed == 0 ? 1 : rgb_matrix_config.speed) ) ) == 0 ? rand() % (DRIVER_LED_TOTAL) : 255;
 
     for ( int i=0; i<DRIVER_LED_TOTAL; i++ )
     {
@@ -577,8 +578,10 @@ void rgb_matrix_custom(void) {
 }
 
 void rgb_matrix_task(void) {
+    static uint8_t toggle_enable_last = 255;
 	if (!rgb_matrix_config.enable) {
     	rgb_matrix_all_off();
+        toggle_enable_last = rgb_matrix_config.enable;
     	return;
     }
     // delay 1 second before driving LEDs or doing anything else
@@ -618,8 +621,9 @@ void rgb_matrix_task(void) {
     // detect change in effect, so each effect can
     // have an optional initialization.
     static uint8_t effect_last = 255;
-    bool initialize = effect != effect_last;
+    bool initialize = (effect != effect_last) || (rgb_matrix_config.enable != toggle_enable_last);
     effect_last = effect;
+    toggle_enable_last = rgb_matrix_config.enable;
 
     // this gets ticked at 20 Hz.
     // each effect can opt to do calculations
@@ -627,9 +631,6 @@ void rgb_matrix_task(void) {
     switch ( effect ) {
         case RGB_MATRIX_SOLID_COLOR:
             rgb_matrix_solid_color();
-            break;
-        case RGB_MATRIX_SOLID_REACTIVE:
-            rgb_matrix_solid_reactive();
             break;
         case RGB_MATRIX_ALPHAS_MODS:
             rgb_matrix_alphas_mods();
@@ -665,6 +666,9 @@ void rgb_matrix_task(void) {
             rgb_matrix_jellybean_raindrops( initialize );
             break;
         #ifdef RGB_MATRIX_KEYPRESSES
+            case RGB_MATRIX_SOLID_REACTIVE:
+                rgb_matrix_solid_reactive();
+                break;
             case RGB_MATRIX_SPLASH:
                 rgb_matrix_splash();
                 break;
@@ -719,10 +723,8 @@ void rgb_matrix_indicators_user(void) {}
 // }
 
 void rgb_matrix_init_drivers(void) {
-    //sei();
-
     // Initialize TWI
-    TWIInit();
+    i2c_init();
     IS31FL3731_init( DRIVER_ADDR_1 );
     IS31FL3731_init( DRIVER_ADDR_2 );
 
@@ -830,8 +832,8 @@ void rgblight_step(void) {
 
 void rgblight_step_reverse(void) {
     rgb_matrix_config.mode--;
-    if (rgb_matrix_config.mode <= 1)
-        rgb_matrix_config.mode = (RGB_MATRIX_EFFECT_MAX - 1);
+    if (rgb_matrix_config.mode < 1)
+        rgb_matrix_config.mode = RGB_MATRIX_EFFECT_MAX - 1;
     eeconfig_update_rgb_matrix(rgb_matrix_config.raw);
 }
 
