@@ -1,4 +1,4 @@
-# osx_jis_koishi/osx_ansi_koishi ErgoDox EZ Keymap
+# koishi Customize Keyboard Keymaps
 
 ## Build Setup
 
@@ -34,6 +34,10 @@ $ teensy_loader_cli -mmcu=atmega32u4 -w -v ergodox_ez_osx_ansi_koishi.hex
 
 $ make ergodash/rev2:koishi:avrdude
 
+### Rhymestone
+
+$ make rhymestone:koishi:avrdude
+
 ## Keymap
 
 ### ErgoDox EZ JIS
@@ -47,3 +51,7 @@ https://github.com/koishi/qmk_firmware/blob/master/keyboards/ergodox_ez/keymaps/
 ### ErgoDash
 
 https://github.com/koishi/qmk_firmware/blob/master/keyboards/ergodash/rev2/keymaps/koishi/keymap.c
+
+### Rhymestone
+
+https://github.com/koishi/qmk_firmware/blob/master/keyboards/rhymestone/keymaps/koishi/keymap.c
