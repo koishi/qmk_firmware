@@ -12,6 +12,10 @@
         "*.c": "c",
         "*.cpp": "cpp",
         "*.hpp": "cpp",
-        "xstddef": "c"
+        "xstddef": "c",
+        "typeinfo": "c",
+        "system_error": "c",
+        "xlocale": "c",
+        "random": "c"
     }
 }
