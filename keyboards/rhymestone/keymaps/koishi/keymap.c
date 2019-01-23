@@ -69,6 +69,9 @@ enum tapdances{
 #define KC_KNRM  AG_NORM
 #define KC_KSWP  AG_SWAP
 
+#define KC_LOWES  LT(_LOWER, KC_LANG2)  // タップで英数 ホールドでLower
+#define KC_RISKN  LT(_RAISE, KC_LANG1)  // タップでかな ホールドでRaise
+
 #define KC_ZSFT  LSFT_T(KC_Z)
 #define KC_MNSF  LSFT_T(KC_MINS)
 #define KC_ESCT  LCTL_T(KC_ESC)
@@ -98,7 +101,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|------+------+------+------+------|------+------+------+------+------|
        ZSFT,     X,     C,     V,     B,     N,     M,  COMM,    UP,  SFPL,\
   //|------+------+------+------+------|------+------+------+------+------|
-       ESCT,  TBAL,  LGUI, LOWER,   SPC,   ENT, RAISE,  LEFT,  DOWN,  RGHT \
+       ESCT,  TBAL,  LGUI, LOWES,   SPC,   ENT, RISKN,  LEFT,  DOWN,  RGHT \
   //|------+------+------+------+-------------+------+------+------+------|
   ),
 
