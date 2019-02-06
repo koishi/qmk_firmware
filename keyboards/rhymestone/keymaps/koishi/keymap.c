@@ -38,7 +38,9 @@ enum custom_keycodes {
   LOWER,
   RAISE,
   ADJUST,
-  RGBRST
+  RGBRST,
+  ZSHIFT,
+  SSHIFT
 };
 
 enum tapdances{
@@ -55,6 +57,7 @@ enum tapdances{
 #define KC______ KC_TRNS
 #define KC_XXXXX KC_NO
 #define KC_KANJI KANJI
+#define KC_ZSHIFT ZSHIFT
 
 #define KC_RST   RESET
 #define KC_LRST  RGBRST
@@ -100,7 +103,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|------+------+------+------+------|------+------+------+------+------|
           A,     S,     D,     F,     G,     H,     J,     K,     L,  SCLN,\
   //|------+------+------+------+------|------+------+------+------+------|
-       ZSFT,     X,     C,     V,     B,     N,     M,  COMM,    UP,  SLSF,\
+     ZSHIFT,     X,     C,     V,     B,     N,     M,  COMM,    UP,  SLSF,\
   //|------+------+------+------+------|------+------+------+------+------|
        ESCT,  TBAL,  LGUI, LOWER,   SPC,   ENT, RAISE,  LEFT,  DOWN,  RGHT \
   //|------+------+------+------+-------------+------+------+------+------|
@@ -225,6 +228,8 @@ static bool lower_pressed = false;
 static uint16_t lower_pressed_time = 0;
 static bool raise_pressed = false;
 static uint16_t raise_pressed_time = 0;
+static bool zshift_pressed = false;
+static uint16_t zshift_pressed_time = 0;
 
 int RGB_current_mode;
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
@@ -285,6 +290,24 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       }
       return false;
       break;
+    case ZSHIFT:
+      if (record->event.pressed) {
+        zshift_pressed = true;
+        zshift_pressed_time = record->event.time;
+        register_code(KC_LSFT);
+      } else {
+        unregister_code(KC_LSFT);
+        if (zshift_pressed) {
+          register_code(KC_Z);
+          unregister_code(KC_Z);
+          zshift_pressed = false;
+          return true;
+        }
+        zshift_pressed = false;
+        // return true;
+      }
+      return false;
+      break;
     case KANJI:
       if (record->event.pressed) {
         if (keymap_config.swap_lalt_lgui == false) {
@@ -313,6 +336,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         break;
     #endif
     default:
+      if (record->event.pressed) {
+        lower_pressed = false;
+        raise_pressed = false;
+        zshift_pressed = false;
+      }
       result = true;
       break;
   }
