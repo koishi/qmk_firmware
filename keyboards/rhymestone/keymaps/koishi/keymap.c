@@ -102,7 +102,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|------+------+------+------+------|------+------+------+------+------|
        ZSFT,     X,     C,     V,     B,     N,     M,  COMM,    UP,  SLSF,\
   //|------+------+------+------+------|------+------+------+------+------|
-       ESCT,  TBAL,  LGUI, LOWES,   SPC,   ENT, RISKN,  LEFT,  DOWN,  RGHT \
+       ESCT,  TBAL,  LGUI, LOWER,   SPC,   ENT, RAISE,  LEFT,  DOWN,  RGHT \
   //|------+------+------+------+-------------+------+------+------+------|
   ),
 
@@ -221,6 +221,11 @@ static inline void update_change_layer(bool pressed, uint8_t layer1, uint8_t lay
   IS_LAYER_ON(layer1) && IS_LAYER_ON(layer2) ? layer_on(layer3) : layer_off(layer3);
 }
 
+static bool lower_pressed = false;
+static uint16_t lower_pressed_time = 0;
+static bool raise_pressed = false;
+static uint16_t raise_pressed_time = 0;
+
 int RGB_current_mode;
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
@@ -239,11 +244,47 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       }
       break;
     case LOWER:
-      update_change_layer(record->event.pressed, _LOWER, _RAISE, _ADJUST);
+      if (record->event.pressed) {
+        lower_pressed = true;
+        lower_pressed_time = record->event.time;
+
+        layer_on(_LOWER);
+        update_tri_layer(_LOWER, _RAISE, _ADJUST);
+      } else {
+        layer_off(_LOWER);
+        update_tri_layer(_LOWER, _RAISE, _ADJUST);
+
+        if (lower_pressed && (TIMER_DIFF_16(record->event.time, lower_pressed_time) < TAPPING_TERM)) {
+          register_code(KC_LANG2); // for macOS
+          register_code(KC_MHEN);
+          unregister_code(KC_MHEN);
+          unregister_code(KC_LANG2);
+        }
+        lower_pressed = false;
+      }
+      return false;
       break;
     case RAISE:
-      update_change_layer(record->event.pressed, _RAISE, _LOWER, _ADJUST);
-        break;
+      if (record->event.pressed) {
+        raise_pressed = true;
+        raise_pressed_time = record->event.time;
+
+        layer_on(_RAISE);
+        update_tri_layer(_LOWER, _RAISE, _ADJUST);
+      } else {
+        layer_off(_RAISE);
+        update_tri_layer(_LOWER, _RAISE, _ADJUST);
+
+        if (raise_pressed && (TIMER_DIFF_16(record->event.time, raise_pressed_time) < TAPPING_TERM)) {
+          register_code(KC_LANG1); // for macOS
+          register_code(KC_HENK);
+          unregister_code(KC_HENK);
+          unregister_code(KC_LANG1);
+        }
+        raise_pressed = false;
+      }
+      return false;
+      break;
     case KANJI:
       if (record->event.pressed) {
         if (keymap_config.swap_lalt_lgui == false) {
