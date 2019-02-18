@@ -125,9 +125,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //,---------------------------------------------------------------------.
         ESC, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,  MINS,   EQL,  BSPC,\
   //|------+------+------+------+------|------+------+------+------+------|
-      XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,  LBRC, XXXXX, XXXXX,  BSLS,  QUOT,\
+      XXXXX, XXXXX, XXXXX, XXXXX,  LCBR,  RCBR, XXXXX, XXXXX,  BSLS,  QUOT,\
   //|------+------+------+------+------|------+------+------+------+------|
-       LSFT, XXXXX, XXXXX, XXXXX, XXXXX,  RBRC, XXXXX,  COMM,   DOT,   GRV,\
+       LSFT, XXXXX, XXXXX, XXXXX,  LBRC,  RBRC, XXXXX,  COMM,   DOT,   GRV,\
   //|------+------+------+------+-------------+------+------+------+------|
       _____, _____, _____, _____, _____, _____, _____, _____, _____, _____ \
   //|------+------+------+------+-------------+------+------+------+------|
