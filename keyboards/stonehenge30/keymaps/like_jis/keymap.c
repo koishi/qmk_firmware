@@ -3,12 +3,11 @@
 #include "bootloader.h"
 #ifdef PROTOCOL_LUFA
 #include "lufa.h"
-#include "split_util.h"
 #endif
 #ifdef SSD1306OLED
   #include "ssd1306.h"
 #endif
-#include "../common/oled_helper.h"
+#include "./common/oled_helper.h"
 
 extern keymap_config_t keymap_config;
 
@@ -16,8 +15,6 @@ extern keymap_config_t keymap_config;
 //Following line allows macro to read current RGB settings
 extern rgblight_config_t rgblight_config;
 #endif
-
-extern uint8_t is_master;
 
 // Each layer gets a name for readability, which is then used in the keymap matrix below.
 // The underscores don't mean anything - you can have a layer called STUFF or any other name.
@@ -37,21 +34,22 @@ enum custom_keycodes {
   KANJI,
 };
 
-// enum tapdances{
-//   TD_P_MN = 0,
-// };
+enum tapdances{
+  TD_CODO = 0,
+};
 
 // Layer Mode aliases
 // #define KC_LOWER LOWER
 // #define KC_RAISE RAISE
 // #define KC_MLLO  MO(_LOWER)
 // #define KC_MLRA  MO(_RAISE)
-// #define KC_MLAD  MO(_ADJUST)
+#define KC_MLAD  MO(_ADJUST)
 
 #define KC______ KC_TRNS
 #define KC_XXXXX KC_NO
 #define KC_KANJI KANJI
 
+// Adjust layer keys
 #define KC_RST   RESET
 #define KC_LRST  RGBRST
 #define KC_LTOG  RGB_TOG
@@ -65,83 +63,78 @@ enum custom_keycodes {
 #define KC_KNRM  AG_NORM
 #define KC_KSWP  AG_SWAP
 
+// Base layer mod tap
 #define KC_A_SF  LSFT_T(KC_A)
 #define KC_Z_CT  LCTL_T(KC_Z)
 #define KC_X_AL  LALT_T(KC_X)
 #define KC_C_GU  LGUI_T(KC_C)
-
-#define KC_F6SF  LSFT_T(KC_F6)
-#define KC_11CT  LCTL_T(KC_F11)
-#define KC_12AL  LALT_T(KC_F12)
-
-#define KC_COGU  LGUI_T(KC_COMM)
-#define KC_DTAL  LALT_T(KC_DOT)
-// #define KC_SSCT  LCTL_T(KC_SLSH)
-#define KC_SPCT  LCTL_T(KC_SPC)
+#define KC_M_CT  LCTL_T(KC_M)
 #define KC_ENSF  LSFT_T(KC_ENT)
 
-#define KC_V_LO  LT(_LOWER, KC_V)
-#define KC_M_RA  LT(_RAISE, KC_M)
-#define KC_P_AD  LT(_ADJUST, KC_P)
+// Lower layer mod tap
+#define KC_MNCT  LCTL_T(KC_MINS)
 
-// #define KC_P_MN  TD(TD_P_MN)
+// Raise layer mod tap
+#define KC_F6SF  LSFT_T(KC_F6)
+#define KC_BSSF  LSFT_T(KC_BSLS)
+#define KC_11CT  LCTL_T(KC_F11)
+#define KC_SSCT  LCTL_T(KC_SLSH)
+#define KC_12AL  LALT_T(KC_F12)
 
-// qk_tap_dance_action_t tap_dance_actions[] = {
-//   [TD_P_MN] = ACTION_TAP_DANCE_DOUBLE(KC_P, KC_MINS),
-// };
+// Layer tap
+#define KC_SPLO  LT(_LOWER, KC_SPC)
+#define KC_BSRA  LT(_RAISE, KC_BSPC)
+
+// Tap dance
+#define KC_CODO  TD(TD_CODO)
+
+qk_tap_dance_action_t tap_dance_actions[] = {
+  [TD_CODO] = ACTION_TAP_DANCE_DOUBLE(KC_COMM, KC_DOT),
+};
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   [_BASE] = LAYOUT_kc( \
-  //,---------------------------------------------------------------------.
-      XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,\
-  //|------+------+------+------+------|------+------+------+------+------|
-          Q,     W,     E,     R,     T,     Y,     U,     I,     O,  P_AD,\
-  //|------+------+------+------+------|------+------+------+------+------|
-       A_SF,     S,     D,     F,     G,     H,     J,     K,     L,  ENSF,\
-  //|------+------+------+------+------|------+------+------+------+------|
-       Z_CT,  X_AL,  C_GU,  V_LO,     B,     N,  M_RA,  COGU,  DTAL,  SPCT \
-  //|------+------+------+------+------|------+------+------+------+------|
+  //,----------------------------------------------------------------------------.
+          Q,     W,     E,     R,     T,  BSRA,     Y,     U,     I,     O,     P,\
+  //|------+------+------+------+------|------|------+------+------+------+------|
+       A_SF,     S,     D,     F,     G,            H,     J,     K,     L,  ENSF,\
+  //|------+------+------+------+------|------|------+------+------+------+------|
+       Z_CT,  X_AL,  C_GU,     V,     B,  SPLO,     N,  M_CT,  CODO \
+  //|------+------+------+------+------|------|------+------+------|
   ),
 
   [_LOWER] = LAYOUT_kc( \
-  //,---------------------------------------------------------------------.
-      XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,\
-  //|------+------+------+------+------|------+------+------+------+------|
-         F1,    F2,    F3,    F4,    F5,  MINS,   EQL,  JYEN,  LBRC,  RBRC,\
-  //|------+------+------+------+------+------+------+------+------+------|
-       F6SF,    F7,    F8,    F9,   F10, XXXXX,  SCLN,  QUOT,  BSLS,  LSFT,\
-  //|------+------+------+------+------+------+------+------+------+------|
-       11CT,  12AL,  LGUI, _____,  BSPC,   SPC, _____,  SLSH,    RO,  LCTL \
-  //|------+------+------+------+------+------+------+------+------+------|
+  //,----------------------------------------------------------------------------.
+          1,     2,     3,     4,     5, _____,     6,     7,     8,     9,     0,\
+  //|------+------+------+------+------|------|------+------+------+------+------|
+       LSFT, _____, _____, _____, _____,         LEFT,  DOWN,    UP,  RGHT,  LSFT,\
+  //|------+------+------+------+------|------|------+------+------+------+------|
+       LCTL,  LALT,  LGUI, _____, _____, _____,  LGUI,  MNCT,   DOT \
+  //|------+------+------+------+------|------|------+------+------|
   ),
 
   [_RAISE] = LAYOUT_kc( \
-  //,---------------------------------------------------------------------.
-      XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,\
-  //|------+------+------+------+------|------+------+------+------+------|
-          1,     2,     3,     4,     5,     6,     7,     8,     9,     0,\
-  //|------+------+------+------+------|------+------+------+------+------|
-       LSFT,   ESC,   TAB, KANJI,   ENT,  LEFT,  DOWN,    UP,  RGHT,  LSFT,\
-  //|------+------+------+------+------|------+------+------+------+------|
-       LCTL,  LALT,  LGUI, _____,   DEL, XXXXX, _____, XXXXX, XXXXX,  LCTL \
-  //|------+------+------+------+-------------+------+------+------+------|
+  //,----------------------------------------------------------------------------.
+         F1,    F2,    F3,    F4,    F5, _____,  MINS,   EQL,  JYEN,  LBRC,  RBRC,\
+  //|------+------+------+------+------|------|------+------+------+------+------|
+       F6SF,    F7,    F8,    F9,   F10,          DEL, XXXXX,  SCLN,  QUOT,  BSSF,\
+  //|------+------+------+------+------|------|------+------+------+------+------|
+       11CT,  12AL,   ESC,   TAB, KANJI,  MLAD,  LGUI,  SSCT,    RO \
+  //|------+------+------+------+------|------|------+------+------|
   ),
 
   [_ADJUST] = LAYOUT_kc( \
-  //,---------------------------------------------------------------------.
-      XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,\
-  //|------+------+------+------+------|------+------+------+------+------|
-        RST,  LRST,  KNRM,  KSWP, XXXXX, XXXXX, XXXXX,  HOME,  PGUP, XXXXX,\
-  //|------+------+------+------+------|------+------+------+------+------|
-       LTOG,  LHUI,  LSAI,  LVAI,  LVAD, XXXXX, XXXXX,   END,  PGDN, _____,\
-  //|------+------+------+------+------|------+------+------+------+------|
-       LMOD,  LHUD,  LSAD, _____, XXXXX, XXXXX, _____, XXXXX, XXXXX, _____ \
-  //|------+------+------+------+-------------+------+------+------+------|
+  //,----------------------------------------------------------------------------.
+        RST,  LRST,  KNRM,  KSWP, XXXXX, _____, XXXXX, XXXXX, XXXXX,  HOME,  PGUP, \
+  //|------+------+------+------+------|------|------+------+------+------+------|
+       LTOG,  LHUI,  LSAI,  LVAI,  LVAD,         BTN1,  MS_U,  BTN2,   END,  PGDN, \
+  //|------+------+------+------+------|------|------+------+------+------+------|
+       LMOD,  LHUD,  LSAD, _____, XXXXX, _____,  MS_L,  MS_D,  MS_R \
+  //|------+------+------+------+------|------|------+------+------|
   )
 };
 
 #define L_BASE _BASE
-// #define L_NUMPAD (1<<_NUMPAD)
 #define L_LOWER (1<<_LOWER)
 #define L_RAISE (1<<_RAISE)
 #define L_ADJUST (1<<_ADJUST)
@@ -157,7 +150,6 @@ typedef struct {
 const LAYER_DISPLAY_NAME layer_display_name[LAYER_DISPLAY_MAX] = {
   {L_BASE, "Base"},
   {L_BASE + 1, "Base"},
-  // {L_NUMPAD, "Numpad"},
   {L_LOWER, "Lower"},
   {L_RAISE, "Raise"},
   {L_ADJUST_TRI, "Adjust"}
@@ -261,8 +253,10 @@ void matrix_init_user(void) {
   #ifdef RGBLIGHT_ENABLE
     RGB_current_mode = rgblight_config.mode;
   #endif
-
-  INIT_OLED();
+  //SSD1306 OLED init, make sure to add #define SSD1306OLED in config.h
+  #ifdef SSD1306OLED
+    iota_gfx_init(false); // turns on the display
+  #endif
 }
 
 //SSD1306 OLED update loop, make sure to add #define SSD1306OLED in config.h
@@ -282,7 +276,6 @@ static inline void matrix_update(struct CharacterMatrix *dest,
 
 static inline void render_status(struct CharacterMatrix *matrix) {
 
-
   UPDATE_LED_STATUS();
   RENDER_LED_STATUS(matrix);
   RENDER_KEYMAP_STATUS(matrix);
@@ -301,11 +294,7 @@ void iota_gfx_task_user(void) {
   #endif
 
   matrix_clear(&matrix);
-  if (is_master) {
-    render_status(&matrix);
-  } else {
-    RENDER_LOGO(&matrix);
-  }
+  render_status(&matrix);
 
   matrix_update(&display, &matrix);
 }

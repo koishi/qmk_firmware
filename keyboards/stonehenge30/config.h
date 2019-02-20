@@ -1,6 +1,5 @@
 /*
-Copyright 2012 Jun Wako <wakojun@gmail.com>
-Copyright 2015 Jack Humbert
+Copyright 2018 REPLACE_WITH_YOUR_NAME
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -16,30 +15,25 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef REV2_CONFIG_H
-#define REV2_CONFIG_H
+#pragma once
+
+#include "config_common.h"
 
 /* USB Device descriptor parameter */
 #define VENDOR_ID       0xFEED
-#define PRODUCT_ID      0xDFA1
-#define DEVICE_VER      0x0020
+#define PRODUCT_ID      0xDFA4
+#define DEVICE_VER      0x0010
 #define MANUFACTURER    marksard
-#define PRODUCT         Rhymestone
-#define DESCRIPTION     A minimum split keyboard with full LED backlight
+#define PRODUCT         stonehenge30
+#define DESCRIPTION     Minimal Symmetrical Staggerd 30 Keys Keyboard
 
-#define PREVENT_STUCK_MODIFIERS
-#define TAPPING_FORCE_HOLD
-#define TAPPING_TERM 150
+/* key matrix size */
+#define MATRIX_ROWS 6
+#define MATRIX_COLS 6
 
 /* Use I2C or Serial */
 #define USE_I2C
-#define USE_SERIAL
 //#define USE_MATRIX_I2C
-
-/* Select hand configuration */
-#define MASTER_LEFT
-// #define MASTER_RIGHT
-// #define EE_HANDS
 
 // OLED support
 //      see ./rules.mk: OLED_ENABLE=yes or no
@@ -47,30 +41,37 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   #define SSD1306OLED
 #endif
 
-/* key matrix size */
-// Rows are doubled-up
-#define MATRIX_ROWS 8
-#define MATRIX_ROW_PINS { F4, F5, F6, F7 }
+/*
+ * Keyboard Matrix Assignments
+ *
+ * Change this to how you wired your keyboard
+ * COLS: AVR pins used for columns, left to right
+ * ROWS: AVR pins used for rows, top to bottom
+ * DIODE_DIRECTION: COL2ROW = COL = Anode (+), ROW = Cathode (-, marked on diode)
+ *                  ROW2COL = ROW = Anode (+), COL = Cathode (-, marked on diode)
+ *
+*/
+#define MATRIX_ROW_PINS { F4, F5, F6, F7, B1, B3 }
+#define MATRIX_COL_PINS { D4, C6, D7, E6, B4, B5 }
+#define UNUSED_PINS
 
-// wiring of each half
-#define MATRIX_COLS 5
-#define MATRIX_COL_PINS { D4, C6, D7, E6, B4 }
+/* COL2ROW, ROW2COL, or CUSTOM_MATRIX */
+#define DIODE_DIRECTION COL2ROW
 
-/* define if matrix has ghost */
+/* Debounce reduces chatter (unintended double-presses) - set 0 if debouncing is not needed */
+#define DEBOUNCING_DELAY 5
+
+/* define if matrix has ghost (lacks anti-ghosting diodes) */
 //#define MATRIX_HAS_GHOST
 
 /* number of backlight levels */
-// #define BACKLIGHT_LEVELS 3
-
-/* Set 0 if debouncing isn't needed */
-#define DEBOUNCING_DELAY 5
 
 /* Mechanical locking support. Use KC_LCAP, KC_LNUM or KC_LSCR instead in keymap */
-//#define LOCKING_SUPPORT_ENABLE
+// #define LOCKING_SUPPORT_ENABLE
 /* Locking resynchronize hack */
-//#define LOCKING_RESYNC_ENABLE
+// #define LOCKING_RESYNC_ENABLE
 
-/* key combination for command */
+/* key combination for magic key command */
 #define IS_COMMAND() ( \
     keyboard_report->mods == (MOD_BIT(KC_LSHIFT) | MOD_BIT(KC_RSHIFT)) \
 )
@@ -82,11 +83,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define ws2812_PORTREG  PORTD
 #define ws2812_DDRREG   DDRD
 
-// Rhymestone keyboard RGB LED support
+// stonehenge30 keyboard RGB LED support
 //#define RGBLIGHT_ANIMATIONS : see ./rules.mk: LED_ANIMATIONS = yes or no
-#ifdef RGBLED_BACK
-  #define RGBLED_NUM 20
-#endif
+//    see ./rules.mk: LED_BACK_ENABLE or LED_UNDERGLOW_ENABLE set yes
+#define RGBLED_NUM 12
 
 #ifndef IOS_DEVICE_ENABLE
   #define RGBLIGHT_LIMIT_VAL 180
@@ -99,7 +99,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define RGBLIGHT_SAT_STEP 17
 
 #if defined(RGBLIGHT_ENABLE) && !defined(IOS_DEVICE_ENABLE)
-// USB_MAX_POWER_CONSUMPTION value for Rhymestone keyboard
+// USB_MAX_POWER_CONSUMPTION value for stonehenge30 keyboard
 //  120  RGBoff, OLEDoff
 //  120  OLED
 //  330  RGB 6
@@ -118,10 +118,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* disable debug print */
-// #define NO_DEBUG
+//#define NO_DEBUG
 
 /* disable print */
-// #define NO_PRINT
+//#define NO_PRINT
 
 /* disable action features */
 //#define NO_ACTION_LAYER
@@ -129,6 +129,3 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //#define NO_ACTION_ONESHOT
 //#define NO_ACTION_MACRO
 //#define NO_ACTION_FUNCTION
-
-
-#endif

@@ -4,7 +4,7 @@
 #   the appropriate keymap folder that will get included automatically
 #
 BOOTMAGIC_ENABLE = no       # Virtual DIP switch configuration(+1000)
-MOUSEKEY_ENABLE = no        # Mouse keys(+4700)
+MOUSEKEY_ENABLE =  yes       # Mouse keys(+4700)
 EXTRAKEY_ENABLE = no        # Audio control and System control(+450)
 CONSOLE_ENABLE = no         # Console for debug(+400)
 COMMAND_ENABLE = no         # Commands for debug and configuration
@@ -16,33 +16,33 @@ UNICODE_ENABLE = no         # Unicode
 BLUETOOTH_ENABLE = no       # Enable Bluetooth with the Adafruit EZ-Key HID
 RGBLIGHT_ENABLE = no        # Enable WS2812 RGB underlight.  Do not enable this with audio at the same time.
 SWAP_HANDS_ENABLE = no      # Enable one-hand typing
-# TAP_DANCE_ENABLE = yes
+TAP_DANCE_ENABLE = yes
 
-# If your custom Rhymestone pcb, you can rewrite to yes.
-OLED_ENABLE = yes           # OLED_ENABLE
-LED_BACK_ENABLE = yes       # LED backlight (Enable WS2812 RGB underlight.)
+# If your custom stonehenge30 pcb, you can rewrite to yes.
+OLED_ENABLE = yes            # OLED_ENABLE
+LED_UNDERGLOW_ENABLE = yes  # LED underglow (Enable WS2812 RGB underlight.)
 LED_ANIMATIONS = yes        # LED animations
 
 # Other selectable option
 IOS_DEVICE_ENABLE = no      # connect to IOS device (iPad,iPhone)
 LOCAL_GLCDFONT = no         # use each keymaps "font.h" insted of "common/glcdfont.c"
 
-Link_Time_Optimization = no # if firmware size over limit, try this option
+Link_Time_Optimization = yes # if firmware size over limit, try this option
+
+ANGELINA_KEYMAP = no        # If Alfa verstion use set to yes.
 
 ifeq ($(strip $(OLED_ENABLE)), yes)
     OPT_DEFS += -DOLED_ENABLE
 endif
 
-ifeq ($(strip $(LED_BACK_ENABLE)), yes)
+ifeq ($(strip $(LED_UNDERGLOW_ENABLE)), yes)
   RGBLIGHT_ENABLE = yes
-  OPT_DEFS += -DRGBLED_BACK
 else
   RGBLIGHT_ENABLE = no
 endif
 
 ifeq ($(strip $(LED_ANIMATIONS)), yes)
-    # OPT_DEFS += -DRGBLIGHT_ANIMATIONS
-    OPT_DEFS += -DLED_ANIMATIONS
+    OPT_DEFS += -DRGBLIGHT_ANIMATIONS
 endif
 
 ifeq ($(strip $(IOS_DEVICE_ENABLE)), yes)
@@ -55,6 +55,10 @@ endif
 
 ifeq ($(strip $(Link_Time_Optimization)),yes)
     EXTRAFLAGS += -flto -DUSE_Link_Time_Optimization
+endif
+
+ifeq ($(strip $(ANGELINA_KEYMAP)), yes)
+    OPT_DEFS += -DANGELINA_KEYMAP
 endif
 
 # Do not enable SLEEP_LED_ENABLE. it uses the same timer as BACKLIGHT_ENABLE
