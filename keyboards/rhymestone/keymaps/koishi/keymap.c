@@ -236,6 +236,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
   UPDATE_KEY_STATUS(keycode, record);
 
+  keymap_config.swap_lalt_lgui = false;
+
   bool result = false;
   switch (keycode) {
     case BASE:
