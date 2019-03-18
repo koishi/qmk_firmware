@@ -38,7 +38,9 @@ enum custom_keycodes {
   LOWER,
   RAISE,
   ADJUST,
-  RGBRST
+  RGBRST,
+  ZSHIFT,
+  SSHIFT
 };
 
 enum tapdances{
@@ -55,6 +57,7 @@ enum tapdances{
 #define KC______ KC_TRNS
 #define KC_XXXXX KC_NO
 #define KC_KANJI KANJI
+#define KC_ZSHIFT ZSHIFT
 
 #define KC_RST   RESET
 #define KC_LRST  RGBRST
@@ -69,8 +72,12 @@ enum tapdances{
 #define KC_KNRM  AG_NORM
 #define KC_KSWP  AG_SWAP
 
+#define KC_LOWES  LT(_LOWER, KC_LANG2)  // タップで英数 ホールドでLower
+#define KC_RISKN  LT(_RAISE, KC_LANG1)  // タップでかな ホールドでRaise
+
 #define KC_ZSFT  LSFT_T(KC_Z)
 #define KC_MNSF  LSFT_T(KC_MINS)
+#define KC_SLSF  LSFT_T(KC_SLSH)
 #define KC_ESCT  LCTL_T(KC_ESC)
 #define KC_TBAL  LALT_T(KC_TAB)
 #define KC_11SF  LSFT_T(KC_F11)
@@ -96,7 +103,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|------+------+------+------+------|------+------+------+------+------|
           A,     S,     D,     F,     G,     H,     J,     K,     L,  SCLN,\
   //|------+------+------+------+------|------+------+------+------+------|
-       ZSFT,     X,     C,     V,     B,     N,     M,  CODO,    UP,  MNSF,\
+       ZSFT,     X,     C,     V,     B,     N,     M,  COMM,    UP,  SLSF,\
   //|------+------+------+------+------|------+------+------+------+------|
        ESCT,  TBAL,  LGUI, LOWER,   SPC,   ENT, RAISE,  LEFT,  DOWN,  RGHT \
   //|------+------+------+------+-------------+------+------+------+------|
@@ -116,25 +123,25 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [_LOWER] = LAYOUT_kc( \
   //,---------------------------------------------------------------------.
-         F1,    F2,    F3,    F4,    F5,  MINS,   EQL,  LBRC,  RBRC,  BSLS,\
+        ESC, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,  MINS,   EQL,  BSPC,\
   //|------+------+------+------+------|------+------+------+------+------|
-         F6,    F7,    F8,    F9,   F10, XXXXX, XXXXX, XXXXX,  SCLN,  QUOT,\
+        TAB, XXXXX, XXXXX, XXXXX,  LCBR,  RCBR, XXXXX, XXXXX,  BSLS,  QUOT,\
   //|------+------+------+------+------|------+------+------+------+------|
-       11SF,   F12,  DLNP, KANJI,   ENT, XXXXX, XXXXX,  COMM,   DOT,   GRV,\
+       LSFT, XXXXX, XXXXX, XXXXX,  LBRC,  RBRC, XXXXX,  COMM,   DOT,   GRV,\
   //|------+------+------+------+-------------+------+------+------+------|
-      _____, _____, _____, _____,   DEL, _____, _____, _____, _____, _____ \
+      _____, _____, _____, _____, _____, _____, _____, _____, _____, _____ \
   //|------+------+------+------+-------------+------+------+------+------|
   ),
 
   [_RAISE] = LAYOUT_kc( \
   //,---------------------------------------------------------------------.
+         F1,    F2,    F3,    F4,    F5,    F6,    F7,    F8,    F9,   F10,\
+  //|------+------+------+------+------|------+------+------+------+------|
           1,     2,     3,     4,     5,     6,     7,     8,     9,     0,\
   //|------+------+------+------+------|------+------+------+------+------|
        EXLM,    AT,  HASH,   DLR,  PERC,  CIRC, AMPR,   ASTR,  LPRN,  RPRN,\
-  //|------+------+------+------+------|------+------+------+------+------|
-       LSFT, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX, XXXXX,  PGUP, XXXXX,\
   //|------+------+------+------+-------------+------+------+------+------|
-      _____, _____, _____, _____,  BSPC,  WLCK, _____,  HOME,  PGDN,   END \
+      _____, _____, _____, _____, _____, _____, _____, _____, _____, _____ \
   //|------+------+------+------+-------------+------+------+------+------|
   ),
 
@@ -217,10 +224,19 @@ static inline void update_change_layer(bool pressed, uint8_t layer1, uint8_t lay
   IS_LAYER_ON(layer1) && IS_LAYER_ON(layer2) ? layer_on(layer3) : layer_off(layer3);
 }
 
+static bool lower_pressed = false;
+static uint16_t lower_pressed_time = 0;
+static bool raise_pressed = false;
+static uint16_t raise_pressed_time = 0;
+static bool zshift_pressed = false;
+static uint16_t zshift_pressed_time = 0;
+
 int RGB_current_mode;
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
   UPDATE_KEY_STATUS(keycode, record);
+
+  keymap_config.swap_lalt_lgui = false;
 
   bool result = false;
   switch (keycode) {
@@ -235,11 +251,65 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       }
       break;
     case LOWER:
-      update_change_layer(record->event.pressed, _LOWER, _RAISE, _ADJUST);
+      if (record->event.pressed) {
+        lower_pressed = true;
+        lower_pressed_time = record->event.time;
+
+        layer_on(_LOWER);
+        update_tri_layer(_LOWER, _RAISE, _ADJUST);
+      } else {
+        layer_off(_LOWER);
+        update_tri_layer(_LOWER, _RAISE, _ADJUST);
+
+        if (lower_pressed && (TIMER_DIFF_16(record->event.time, lower_pressed_time) < TAPPING_TERM)) {
+          register_code(KC_LANG2); // for macOS
+          register_code(KC_MHEN);
+          unregister_code(KC_MHEN);
+          unregister_code(KC_LANG2);
+        }
+        lower_pressed = false;
+      }
+      return false;
       break;
     case RAISE:
-      update_change_layer(record->event.pressed, _RAISE, _LOWER, _ADJUST);
-        break;
+      if (record->event.pressed) {
+        raise_pressed = true;
+        raise_pressed_time = record->event.time;
+
+        layer_on(_RAISE);
+        update_tri_layer(_LOWER, _RAISE, _ADJUST);
+      } else {
+        layer_off(_RAISE);
+        update_tri_layer(_LOWER, _RAISE, _ADJUST);
+
+        if (raise_pressed && (TIMER_DIFF_16(record->event.time, raise_pressed_time) < TAPPING_TERM)) {
+          register_code(KC_LANG1); // for macOS
+          register_code(KC_HENK);
+          unregister_code(KC_HENK);
+          unregister_code(KC_LANG1);
+        }
+        raise_pressed = false;
+      }
+      return false;
+      break;
+    case ZSHIFT:
+      if (record->event.pressed) {
+        zshift_pressed = true;
+        zshift_pressed_time = record->event.time;
+        register_code(KC_LSFT);
+      } else {
+        unregister_code(KC_LSFT);
+        if (zshift_pressed) {
+          register_code(KC_Z);
+          unregister_code(KC_Z);
+          zshift_pressed = false;
+          return true;
+        }
+        zshift_pressed = false;
+        // return true;
+      }
+      return false;
+      break;
     case KANJI:
       if (record->event.pressed) {
         if (keymap_config.swap_lalt_lgui == false) {
@@ -268,6 +338,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         break;
     #endif
     default:
+      if (record->event.pressed) {
+        lower_pressed = false;
+        raise_pressed = false;
+        zshift_pressed = false;
+      }
       result = true;
       break;
   }
