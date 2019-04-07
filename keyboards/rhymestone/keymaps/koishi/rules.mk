@@ -19,8 +19,8 @@ SWAP_HANDS_ENABLE = no      # Enable one-hand typing
 TAP_DANCE_ENABLE = yes
 
 # If your custom Rhymestone pcb, you can rewrite to yes.
-OLED_ENABLE = yes           # OLED_ENABLE
-LED_BACK_ENABLE = yes       # LED backlight (Enable WS2812 RGB underlight.)
+OLED_ENABLE = no            # OLED_ENABLE
+LED_BACK_ENABLE = no        # LED backlight (Enable WS2812 RGB underlight.)
 LED_ANIMATIONS = yes        # LED animations
 
 # Other selectable option
