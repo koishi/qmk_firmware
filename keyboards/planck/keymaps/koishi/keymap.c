@@ -181,6 +181,9 @@ uint32_t layer_state_set_user(uint32_t state) {
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+
+  keymap_config.swap_lalt_lgui = false;
+
   switch (keycode) {
     case QWERTY:
       if (record->event.pressed) {
