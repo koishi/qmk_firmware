@@ -38,6 +38,10 @@ $ make ergodash/rev2:koishi:avrdude
 
 $ make rhymestone:koishi:avrdude
 
+### Planck
+
+$ make planck/rev4:koishi:dfu
+
 ## Keymap
 
 ### ErgoDox EZ JIS
