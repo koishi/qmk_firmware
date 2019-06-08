@@ -8,9 +8,9 @@ $ brew tap osx-cross/avr
 
 $ brew install dfu-programmer
 
-$ brew install avr-gcc
+$ brew install avr-gcc@7
 
-$ brew install avr-libc
+$ echo 'export PATH="/usr/local/opt/avr-gcc@7/bin:$PATH"' >> ~/.bash_profile
 
 ## Build Command
 
