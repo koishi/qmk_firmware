@@ -12,6 +12,26 @@ $ brew install avr-gcc@7
 
 $ echo 'export PATH="/usr/local/opt/avr-gcc@7/bin:$PATH"' >> ~/.bash_profile
 
+or
+
+$ brew tap osx-cross/avr
+
+$ brew tap PX4/homebrew-px4
+
+$ brew update
+
+$ brew install avr-gcc@8
+
+$ brew link --force avr-gcc@8
+
+$ brew install dfu-programmer
+
+$ brew install dfu-util
+
+$ brew install gcc-arm-none-eabi
+
+$ brew install avrdude
+
 ## Build Command
 
 $ cd /Users/koishi/dev_private/qmk_firmware/
@@ -38,6 +58,10 @@ $ make ergodash/rev2:koishi:avrdude
 
 $ make rhymestone:koishi:avrdude
 
+### Planck
+
+$ make planck/rev6:koishi:dfu-util
+
 ## Keymap
 
 ### ErgoDox EZ JIS
@@ -55,3 +79,7 @@ https://github.com/koishi/qmk_firmware/blob/master/keyboards/ergodash/rev2/keyma
 ### Rhymestone
 
 https://github.com/koishi/qmk_firmware/blob/master/keyboards/rhymestone/keymaps/koishi/keymap.c
+
+### Planck
+
+https://github.com/koishi/qmk_firmware/blob/master/keyboards/planck/keymaps/koishi/keymap.c
