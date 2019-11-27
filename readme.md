@@ -62,6 +62,10 @@ $ make rhymestone:koishi:avrdude
 
 $ make planck/rev6:koishi:dfu-util
 
+### MiniVan
+
+$ make thevankeyboards/minivan:koishi
+
 ## Keymap
 
 ### ErgoDox EZ JIS
